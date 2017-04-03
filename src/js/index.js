@@ -1,3 +1,5 @@
+/* global window */
+"use strict";
 
 const fieldSize = require('./Config.js').fieldSize;
 const scale = require('./Config.js').scale;
@@ -5,13 +7,21 @@ const scale = require('./Config.js').scale;
 const Game = require('./Game.js');
 const maps = require('./Maps.js');
 
+const Modplayer = require('webaudio-mod-player');
+
 window.addEventListener('load', 
 function() {
     var canvas = document.getElementById("screen");
     canvas.width = fieldSize * scale;
     canvas.height = fieldSize * scale;
-    window.ctx = canvas.getContext("2d"); // FIXME: booh!
 
+    var modplayer = new Modplayer();
+    modplayer.onReady = function() {
+        modplayer.play();
+    };
+    modplayer.load('assets/pacman%20beats7.mod');
+
+    window.ctx = canvas.getContext("2d"); // FIXME: booh!
     var game = new Game(maps[1]);
     game.start();
 

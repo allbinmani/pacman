@@ -1,3 +1,4 @@
+/* global ctx */
 "use strict";
 
 const scale = require('./Config').scale;

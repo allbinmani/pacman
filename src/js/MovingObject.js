@@ -31,7 +31,7 @@ MovingObject.prototype.update = function() {
         this.pos[0] = parseInt(this.x,10);
         this.pos[1] = parseInt(this.y,10);
 //        console.log("MO.update, new sqr  pos, ndir", this.pos, this.ndir);
-        if(this.ndir && this.ndir.length == 2) { 
+        if(this.ndir && this.ndir.length === 2) { 
             var nextPos = [ (this.pos[0] + this.ndir[0]), 
                             (this.pos[1] + this.ndir[1]) ];
             if(this.canMoveTo(nextPos[0], nextPos[1]))  {

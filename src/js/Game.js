@@ -19,6 +19,7 @@ Game.prototype.start = function()
     this.field = new Field(this, this.map);
     this.pacman = new PacMan(this);
     this.ghosts = [];
+    this.score = 0;
     this.lastGhost = 0;
     this.lastUpdate = 0;
     this.frame();
@@ -43,18 +44,25 @@ Game.prototype.update = function()
   	    this.lastGhost = now;
         this.ghosts.push(new Ghost(this));
     }
-    
-    this.pacman.update();
+
     this.ghosts.forEach(function(ghost) {
                             ghost.update();
                         });
 
-	var px = this.pacman.pos[0],
-    py = this.pacman.pos[1];
-	var res = this.field.eat(px, py);
-    if (res !== false) { // Candy!!
-        this.score += parseInt(res.score,10);
-        document.getElementById('score').innerText = this.score;
+    var px = this.pacman.pos[0],
+        py = this.pacman.pos[1];
+    if(this.pacman.update()) {
+        // Moved to a new square, try to eat
+        if(this.pacman.pos[0] !== px || this.pacman.pos[1] !== py) {
+            px = this.pacman.pos[0];
+            py = this.pacman.pos[1];
+
+            var res = this.field.eat(px, py);
+            if (res !== false) { // Candy!!
+                this.score += parseInt(res, 10);
+                document.getElementById('score').innerText = this.score;
+            }
+        }
     }
 
     this.ghosts.forEach(function(ghost) {
