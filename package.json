@@ -1,0 +1,28 @@
+{
+  "name": "pacman-twist",
+  "version": "1.0.0",
+  "main": "bundle.js",
+  "dependencies": {
+    "browserify": "^14.1.0",
+    "http-server": "^0.9.0"
+  },
+  "devDependencies": {
+    "browserify": "^14.1.0",
+    "http-server": "^0.9.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "if [ ! -d build ]; then mkdir build; fi; (cd src; ../node_modules/.bin/browserify -o ../build/bundle.js index.js)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/allbinmani/pacman.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/allbinmani/pacman/issues"
+  },
+  "homepage": "https://github.com/allbinmani/pacman#readme",
+  "description": ""
+}
