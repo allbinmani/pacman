@@ -1,0 +1,12 @@
+{
+    "esversion": 6,
+    "strict": true,
+    "globalstrict": true,
+    "eqeqeq": true,
+    "eqnull": true,
+    "curly": true,
+    "asi": false,
+    "evil": false,
+    "browser": true,
+    "node": true
+}

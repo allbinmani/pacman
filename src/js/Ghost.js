@@ -13,11 +13,24 @@ const Candy = require('./Candy.js');
 
 function Ghost(game, attr)
 {
-  MovingObject.call(this, game, {speed: ghostSpeed,
-  															 fillStyle: 'orange', strokeStyle: 'white', 
-                                 radius: scale/2,
-  															 edible: false, 
-                                 score: 10}, attr);
+  MovingObject.call(this, game,
+    Object.assign({ speed: ghostSpeed,
+                    styles: {
+    					fillStyle: 'orange', 
+                      strokeStyle: 'white',
+                      strokeWidth: 0
+                    },
+                    primitives: [
+                      { type: 'sphere',
+                        center: true,
+                        radius: scale/2,
+                        start_angle: Math.PI + (Math.PI / 3),
+                        end_angle: Math.PI + (Math.PI * 2 - (Math.PI / 3))
+                      }
+                    ],
+    			    edible: false, 
+                    score: 100}, 
+                    attr));
     this.attr.orig_speed = this.attr.speed;
 }
 
@@ -31,6 +44,7 @@ Ghost.prototype.reset = function()
     this.x = fieldSize>>1;
     this.y = fieldSize>>1;
     this.dir = [0,0];
+    this.rot = 0;
     this.pos = [this.x, this.y];
     this.steps = 0;
 };
@@ -38,7 +52,7 @@ Ghost.prototype.reset = function()
 Ghost.prototype.update = function() 
 {
     if (//(this.dir[0] === 0 && this.dir[1] === 0) ||
-        (Math.random() < 0.005) ||
+        (Math.random() < 0.05) ||
         (!MovingObject.prototype.update.apply(this, [this]) )) 
     {
         // Choose a new direction, that is preferably NOT the current direction

@@ -6,6 +6,8 @@ const fieldSize = require('./Config').fieldSize;
 const candyScore = require('./Config').candyScore;
 
 const Candy = require('./Candy');
+const Poop = require('./Poop');
+import Brick from './Brick';
 
 /**
  * Field
@@ -20,19 +22,44 @@ function Field(game, map) {
 
 // x and y must be integers
 Field.prototype.at = function(x, y) {
-    return this.data[y][x];
+    return typeof this.data[y] !== 'undefined' ? this.data[y][x] : [];
+};
+
+Field.prototype.remove = function(go) {
+    let x = go.x;
+    let y = go.y;
+    if(!this.data[y]) {
+        throw new Error('GameObject was never here');
+    }
+    let idx = this.data[y][x].indexOf(go);
+    if(idx !== -1) {
+        this.data[y][x].splice(idx,1);
+    }
+    return true;
+};
+
+Field.prototype.add = function(go) {
+    let x = go.x;
+    let y = go.y;
+    if(typeof this.data[y] === 'undefined') {
+        this.data[y] = [];
+    }
+    if(typeof this.data[y][x] === 'undefined') {
+        this.data[y][x] = [];
+    }
+
+    this.data[y][x].unshift( go );
+    this.markDirty(x,y);
+    return true;
 };
 
 Field.prototype.eat = function(x, y) {
-    var c = this.data[y][x];
-    return (c instanceof Candy) && c.attr.edible ? c.consume() : false;
 };
 
 Field.prototype.reset = function() 
 {
     var game = this.game;
-    this.candy = [];
-    var data = [];
+    this.dirty = {};
     this.map.forEach(
         function(row, y) 
         {
@@ -40,51 +67,59 @@ Field.prototype.reset = function()
                 function(c, x) {
                     if (c !== '#') {
       	                // TODO: Candy type
-                        c = new Candy(game, {x:x, y:y, score: candyScore[0]});
-	                    this.candy.push(c);
-                        
+                        this.add( new Candy(game, {x:x, y:y, score: candyScore[0]}) );                        
+                    } else {
+                        this.add( new Brick(game, {x:x, y:y}) );
                     }
-                    if(!data[y]) {
-                        data[y] = [];
-                    }
-                    data[y][x] = c;
                 }.bind(this));
         }.bind(this));
-    this.dirty = [];
-    this.data = data;
 	this.firstDraw = true;
 };
 
 Field.prototype.markDirty = function(x,y) {
-	this.dirty[y][x] = true;
+    let idx = Math.floor(y)*fieldSize + Math.floor(x);
+	this.dirty[idx] = true;
 };
 
 Field.prototype.draw = function() {
-//	console.log("Field.draw");
-	if(this.firstDraw) {
+//    console.log("draw %d dirty", Object.keys(this.dirty).length);
+    let dirt = this.dirty;
+    this.dirty = {};
+    // Object.keys(dirt).forEach((xy) => {
+    //     let y = Math.floor(xy / fieldSize);
+    //     let x = xy % fieldSize;
+    //     let c = this.at(x,y);
+    //     //console.log('dirty', xy, x, y);
+    //     if(c) {
+    //         this.game.renderer.beginUpdate(x,y);
+    //         c.forEach((go) => { 
+    //             go.draw(); 
+    //         });
+    //         this.game.renderer.endUpdate(x,y);
+    //     }
+    // });
 
-        ctx.beginPath();
-        ctx.rect(0, 0, Math.floor(scale*fieldSize), Math.floor(scale*fieldSize));
-        ctx.strokeStyle = "lightblue";
-        ctx.fillStyle = "black";
-        ctx.fill();
-
-        for (var y = 0; y < fieldSize; y++) {
-            for (var x = 0; x < fieldSize; x++) {
-                
-                if (this.data[y][x] === '#') {
-                    ctx.beginPath();
-                    ctx.rect(x * scale, y * scale, scale, scale);
-                    ctx.fillStyle = "blue";
-                    ctx.fill();
-                    ctx.stroke();
-                }
+    for (let y = 0; y < fieldSize; y++) {
+        for (let x = 0; x < fieldSize; x++) {
+            
+            let c = this.at(x,y);
+            if(c.length !== 0) {
+                this.game.renderer.beginUpdate(x,y);
+                c.forEach((go) => { 
+                    this.game.renderer.renderGameObject(go);
+                });
+                this.game.renderer.endUpdate();
             }
+
+            // if (data[y][x] === '#') {
+            //     ctx.beginPath();
+            //     ctx.rect(x * scale, y * scale, scale, scale);
+            //     ctx.fillStyle = "blue";
+            //     ctx.fill();
+            //     ctx.stroke();
+            // }
         }
-  	    this.firstDraw = false;
-	}
-    this.dirty = [];
-    this.candy.forEach(function(c) { c.draw(); });
+    }
 };
 
 
